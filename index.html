@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Amway Contact Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink:     #1a1208;
+    --paper:   #faf7f2;
+    --burnt:   #c8622a;
+    --amber:   #e8a050;
+    --cream:   #f0e8d8;
+    --sage:    #4a7c59;
+    --mist:    #e8e0d4;
+    --ghost:   #b0a090;
+    --card:    #ffffff;
+    --shadow:  0 2px 20px rgba(26,18,8,0.10);
+    --shadow-lg: 0 8px 40px rgba(26,18,8,0.15);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--paper);
+    font-family: 'DM Sans', sans-serif;
+    color: var(--ink);
+    min-height: 100vh;
+  }
+
+  /* ── Grain overlay ── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none; z-index: 0;
+  }
+
+  /* ── Header ── */
+  header {
+    background: var(--ink);
+    padding: 0 32px;
+    display: flex;
+    align-items: center;
+    height: 64px;
+    position: sticky; top: 0; z-index: 100;
+    box-shadow: 0 2px 24px rgba(0,0,0,0.25);
+  }
+  .logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--amber);
+    letter-spacing: 0.04em;
+  }
+  .logo span { color: #fff; font-weight: 400; }
+  .header-right {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+  .count-badge {
+    background: var(--burnt);
+    color: #fff;
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 50px;
+    letter-spacing: 0.05em;
+  }
+  .export-btn {
+    background: transparent;
+    border: 1.5px solid rgba(255,255,255,0.25);
+    color: #fff;
+    padding: 7px 18px;
+    border-radius: 50px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.03em;
+  }
+  .export-btn:hover { background: rgba(255,255,255,0.1); border-color: var(--amber); color: var(--amber); }
+
+  /* ── Layout ── */
+  .wrapper {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+    position: relative; z-index: 1;
+  }
+
+  /* ── Tab bar ── */
+  .tabs {
+    display: flex;
+    gap: 4px;
+    background: var(--cream);
+    border-radius: 14px;
+    padding: 5px;
+    margin-bottom: 32px;
+    width: fit-content;
+  }
+  .tab {
+    padding: 9px 24px;
+    border-radius: 10px;
+    border: none;
+    background: transparent;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 500;
+    color: var(--ghost);
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.02em;
+  }
+  .tab.active {
+    background: var(--card);
+    color: var(--burnt);
+    font-weight: 600;
+    box-shadow: var(--shadow);
+  }
+
+  /* ── Add Contact Panel ── */
+  .panel {
+    background: var(--card);
+    border-radius: 20px;
+    padding: 36px 40px;
+    box-shadow: var(--shadow);
+    margin-bottom: 28px;
+    border: 1px solid var(--mist);
+    animation: fadeUp 0.4s ease both;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .panel-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.6rem;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 6px;
+  }
+  .panel-sub {
+    font-size: 0.85rem;
+    color: var(--ghost);
+    margin-bottom: 28px;
+    font-weight: 300;
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+  }
+  .form-group { display: flex; flex-direction: column; gap: 7px; }
+  .form-group.full { grid-column: 1 / -1; }
+
+  label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ghost);
+  }
+
+  input, select, textarea {
+    padding: 12px 16px;
+    border: 1.5px solid var(--mist);
+    border-radius: 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.92rem;
+    color: var(--ink);
+    background: var(--paper);
+    transition: border 0.2s, box-shadow 0.2s;
+    outline: none;
+  }
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--burnt);
+    box-shadow: 0 0 0 3px rgba(200,98,42,0.12);
+    background: #fff;
+  }
+  select { cursor: pointer; }
+  textarea { resize: vertical; min-height: 80px; }
+
+  .form-actions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-top: 28px;
+    padding-top: 24px;
+    border-top: 1px solid var(--mist);
+  }
+  .btn-primary {
+    background: var(--burnt);
+    color: #fff;
+    border: none;
+    padding: 13px 32px;
+    border-radius: 50px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.92rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.02em;
+  }
+  .btn-primary:hover { background: #a84e20; transform: translateY(-1px); box-shadow: 0 4px 16px rgba(200,98,42,0.35); }
+  .btn-primary:active { transform: translateY(0); }
+  .btn-ghost {
+    background: transparent;
+    color: var(--ghost);
+    border: 1.5px solid var(--mist);
+    padding: 12px 24px;
+    border-radius: 50px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.88rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-ghost:hover { border-color: var(--ghost); color: var(--ink); }
+
+  /* ── Success toast ── */
+  .toast {
+    position: fixed;
+    bottom: 32px; right: 32px;
+    background: var(--sage);
+    color: #fff;
+    padding: 14px 22px;
+    border-radius: 14px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    box-shadow: var(--shadow-lg);
+    transform: translateY(80px);
+    opacity: 0;
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    z-index: 999;
+    pointer-events: none;
+  }
+  .toast.show { transform: translateY(0); opacity: 1; }
+
+  /* ── Search bar ── */
+  .search-row {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+    align-items: center;
+  }
+  .search-input {
+    flex: 1;
+    padding: 11px 18px 11px 42px;
+    border: 1.5px solid var(--mist);
+    border-radius: 50px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    background: var(--card) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%23b0a090' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' viewBox='0 0 24 24'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E") no-repeat 16px center;
+    outline: none;
+    transition: border 0.2s;
+  }
+  .search-input:focus { border-color: var(--burnt); }
+  .filter-select {
+    padding: 10px 16px;
+    border: 1.5px solid var(--mist);
+    border-radius: 50px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.88rem;
+    color: var(--ink);
+    background: var(--card);
+    outline: none;
+    cursor: pointer;
+    min-width: 180px;
+  }
+
+  /* ── Table ── */
+  .table-wrap {
+    background: var(--card);
+    border-radius: 20px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--mist);
+    overflow: hidden;
+    animation: fadeUp 0.4s ease both;
+  }
+  table { width: 100%; border-collapse: collapse; }
+  thead tr {
+    background: var(--ink);
+  }
+  thead th {
+    padding: 14px 16px;
+    text-align: left;
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--amber);
+    white-space: nowrap;
+  }
+  tbody tr {
+    border-bottom: 1px solid var(--mist);
+    transition: background 0.15s;
+  }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: var(--paper); }
+  tbody td {
+    padding: 14px 16px;
+    font-size: 0.88rem;
+    color: var(--ink);
+    vertical-align: middle;
+  }
+  .td-name { font-weight: 600; }
+  .td-show {
+    display: inline-block;
+    padding: 3px 10px;
+    background: var(--cream);
+    border-radius: 50px;
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: var(--burnt);
+    white-space: nowrap;
+  }
+  .td-product {
+    display: inline-block;
+    padding: 3px 10px;
+    background: #eef4ff;
+    border-radius: 50px;
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: #1d4ed8;
+    white-space: nowrap;
+  }
+  .td-date { color: var(--ghost); font-size: 0.82rem; }
+  .td-phone { font-family: monospace; font-size: 0.85rem; }
+  .delete-btn {
+    background: none;
+    border: none;
+    color: var(--mist);
+    cursor: pointer;
+    font-size: 1.1rem;
+    padding: 4px 8px;
+    border-radius: 8px;
+    transition: all 0.15s;
+    line-height: 1;
+  }
+  .delete-btn:hover { background: #fff0ed; color: var(--burnt); }
+
+  /* ── Empty state ── */
+  .empty {
+    text-align: center;
+    padding: 64px 20px;
+    color: var(--ghost);
+  }
+  .empty-icon { font-size: 3rem; margin-bottom: 14px; display: block; }
+  .empty-text { font-size: 1rem; font-weight: 300; }
+
+  /* ── Stats row ── */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    margin-bottom: 28px;
+  }
+  .stat-card {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 20px 22px;
+    border: 1px solid var(--mist);
+    box-shadow: var(--shadow);
+    animation: fadeUp 0.4s ease both;
+  }
+  .stat-card:nth-child(2) { animation-delay: 0.05s; }
+  .stat-card:nth-child(3) { animation-delay: 0.10s; }
+  .stat-card:nth-child(4) { animation-delay: 0.15s; }
+  .stat-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2.4rem;
+    font-weight: 700;
+    color: var(--burnt);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .stat-label {
+    font-size: 0.78rem;
+    color: var(--ghost);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  /* ── Hidden ── */
+  .hidden { display: none !important; }
+
+  @media (max-width: 700px) {
+    .form-grid { grid-template-columns: 1fr; }
+    .stats { grid-template-columns: 1fr 1fr; }
+    .panel { padding: 24px 20px; }
+    header { padding: 0 16px; }
+    .wrapper { padding: 24px 14px 60px; }
+    .search-row { flex-wrap: wrap; }
+    .filter-select { min-width: 100%; }
+    thead th:nth-child(5), tbody td:nth-child(5) { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Amway <span>Tracker</span></div>
+  <div class="header-right">
+    <span class="count-badge" id="headerCount">0 contacts</span>
+    <button class="export-btn" onclick="exportCSV()">⬇ Export CSV</button>
+  </div>
+</header>
+
+<div class="wrapper">
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('add', this)">＋ Add Contact</button>
+    <button class="tab" onclick="switchTab('list', this)">📋 All Contacts</button>
+  </div>
+
+  <!-- ── ADD TAB ── -->
+  <div id="tab-add">
+    <div class="panel">
+      <div class="panel-title">Add New Contact</div>
+      <div class="panel-sub">Fill in the details from your card — takes 20 seconds</div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Show Name</label>
+          <select id="f-show">
+            <option value="">— Select show —</option>
+            <option>Mitch Sunday Market</option>
+            <option>Shipshiwana Road Show</option>
+            <option>Chicago Health Expo</option>
+            <option>Naperville Business Fair</option>
+            <option>Fort Wayne Road Show</option>
+            <option>South Bend Road Show</option>
+            <option>Other</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Show Date</label>
+          <input type="date" id="f-date">
+        </div>
+
+        <div class="form-group">
+          <label>Contact Name</label>
+          <input type="text" id="f-name" placeholder="Full name">
+        </div>
+
+        <div class="form-group">
+          <label>Phone Number</label>
+          <input type="tel" id="f-phone" placeholder="e.g. 312-555-0101">
+        </div>
+
+        <div class="form-group full">
+          <label>Product They Want / Bought</label>
+          <select id="f-product">
+            <option value="">— Select product —</option>
+            <optgroup label="Nutrition">
+              <option>Nutrilite Double X</option>
+              <option>Nutrilite Protein Powder</option>
+              <option>Nutrilite Kids Vitamins</option>
+              <option>Perfect Pack</option>
+            </optgroup>
+            <optgroup label="Energy">
+              <option>XS Energy Drink</option>
+            </optgroup>
+            <optgroup label="Beauty">
+              <option>Artistry Skincare</option>
+              <option>Artistry Lipstick</option>
+            </optgroup>
+            <optgroup label="Home">
+              <option>LOC Multi-Purpose Cleaner</option>
+              <option>Dish Drops</option>
+              <option>eSpring Water Purifier</option>
+              <option>Atmosphere Air Purifier</option>
+              <option>Amway Queen Cookware</option>
+            </optgroup>
+            <optgroup label="Personal Care">
+              <option>Glister Toothpaste</option>
+              <option>Satinique Shampoo</option>
+              <option>Body Series Body Wash</option>
+            </optgroup>
+            <option>Other / Multiple</option>
+          </select>
+        </div>
+
+        <div class="form-group full">
+          <label>Notes (optional)</label>
+          <textarea id="f-notes" placeholder="e.g. Wants free delivery, call back next week…"></textarea>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button class="btn-primary" onclick="addContact()">Save Contact</button>
+        <button class="btn-ghost" onclick="clearForm()">Clear</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── LIST TAB ── -->
+  <div id="tab-list" class="hidden">
+
+    <div class="stats">
+      <div class="stat-card">
+        <div class="stat-num" id="s-total">0</div>
+        <div class="stat-label">Total Contacts</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" id="s-shows">0</div>
+        <div class="stat-label">Shows Attended</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" id="s-recent">0</div>
+        <div class="stat-label">Added This Month</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" id="s-products">0</div>
+        <div class="stat-label">Unique Products</div>
+      </div>
+    </div>
+
+    <div class="search-row">
+      <input class="search-input" id="searchInput" placeholder="Search by name, phone, product…" oninput="renderTable()">
+      <select class="filter-select" id="filterShow" onchange="renderTable()">
+        <option value="">All Shows</option>
+      </select>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Phone</th>
+            <th>Show</th>
+            <th>Date</th>
+            <th>Product</th>
+            <th>Notes</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="contactTable"></tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── Data store (localStorage) ────────────────────────────────────────────────
+const STORE_KEY = 'amway_contacts';
+
+function load() {
+  try { return JSON.parse(localStorage.getItem(STORE_KEY)) || []; }
+  catch { return []; }
+}
+function save(data) {
+  localStorage.setItem(STORE_KEY, JSON.stringify(data));
+}
+
+// Seed sample data on first load
+if (!localStorage.getItem(STORE_KEY)) {
+  save([
+    { id: 1, show: "Mitch Sunday Market",    date: "2025-02-23", name: "Sarah Johnson",  phone: "312-555-0101", product: "Nutrilite Double X",       notes: "Interested in wellness bundle" },
+    { id: 2, show: "Mitch Sunday Market",    date: "2025-02-23", name: "Mike Patel",     phone: "773-555-0202", product: "Artistry Skincare",        notes: "Monthly reorder customer" },
+    { id: 3, show: "Shipshiwana Road Show",  date: "2025-03-12", name: "David Williams", phone: "847-555-0404", product: "eSpring Water Purifier",   notes: "Wants free delivery" },
+    { id: 4, show: "Shipshiwana Road Show",  date: "2025-03-12", name: "Priya Sharma",   phone: "224-555-0505", product: "Nutrilite Protein Powder", notes: "" },
+  ]);
+}
+
+// ── Tab switching ────────────────────────────────────────────────────────────
+function switchTab(tab, btn) {
+  document.getElementById('tab-add').classList.toggle('hidden', tab !== 'add');
+  document.getElementById('tab-list').classList.toggle('hidden', tab !== 'list');
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  if (tab === 'list') { updateStats(); renderTable(); }
+}
+
+// ── Add contact ──────────────────────────────────────────────────────────────
+function addContact() {
+  const show    = document.getElementById('f-show').value.trim();
+  const date    = document.getElementById('f-date').value;
+  const name    = document.getElementById('f-name').value.trim();
+  const phone   = document.getElementById('f-phone').value.trim();
+  const product = document.getElementById('f-product').value;
+  const notes   = document.getElementById('f-notes').value.trim();
+
+  if (!show || !name || !phone) {
+    showToast('⚠️  Please fill in Show, Name and Phone', '#c8622a');
+    return;
+  }
+
+  const data = load();
+  data.push({ id: Date.now(), show, date, name, phone, product, notes });
+  save(data);
+
+  updateHeaderCount();
+  clearForm();
+  showToast('✅  Contact saved!', '#4a7c59');
+}
+
+function clearForm() {
+  ['f-show','f-date','f-name','f-phone','f-product','f-notes'].forEach(id => {
+    const el = document.getElementById(id);
+    el.value = '';
+  });
+}
+
+// ── Render table ─────────────────────────────────────────────────────────────
+function renderTable() {
+  const data    = load();
+  const search  = document.getElementById('searchInput').value.toLowerCase();
+  const filterS = document.getElementById('filterShow').value;
+
+  // Populate show filter
+  const showFilter = document.getElementById('filterShow');
+  const shows = [...new Set(data.map(d => d.show))].filter(Boolean);
+  const current = showFilter.value;
+  showFilter.innerHTML = '<option value="">All Shows</option>' +
+    shows.map(s => `<option ${s===current?'selected':''}>${s}</option>`).join('');
+
+  const filtered = data.filter(r => {
+    const matchSearch = !search ||
+      r.name.toLowerCase().includes(search) ||
+      r.phone.includes(search) ||
+      (r.product||'').toLowerCase().includes(search) ||
+      (r.notes||'').toLowerCase().includes(search);
+    const matchShow = !filterS || r.show === filterS;
+    return matchSearch && matchShow;
+  });
+
+  const tbody = document.getElementById('contactTable');
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="7">
+      <div class="empty">
+        <span class="empty-icon">📭</span>
+        <div class="empty-text">${data.length === 0 ? 'No contacts yet — add your first one!' : 'No results match your search'}</div>
+      </div>
+    </td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = filtered.slice().reverse().map(r => `
+    <tr>
+      <td class="td-name">${esc(r.name)}</td>
+      <td class="td-phone">${esc(r.phone)}</td>
+      <td><span class="td-show">${esc(r.show)}</span></td>
+      <td class="td-date">${r.date ? formatDate(r.date) : '—'}</td>
+      <td>${r.product ? `<span class="td-product">${esc(r.product)}</span>` : '<span style="color:var(--ghost)">—</span>'}</td>
+      <td style="color:var(--ghost);font-size:0.82rem;max-width:180px">${esc(r.notes||'')}</td>
+      <td><button class="delete-btn" onclick="deleteContact(${r.id})" title="Delete">✕</button></td>
+    </tr>
+  `).join('');
+}
+
+function deleteContact(id) {
+  if (!confirm('Remove this contact?')) return;
+  save(load().filter(r => r.id !== id));
+  updateStats(); renderTable(); updateHeaderCount();
+  showToast('🗑  Contact removed', '#c8622a');
+}
+
+// ── Stats ────────────────────────────────────────────────────────────────────
+function updateStats() {
+  const data = load();
+  const now = new Date();
+  const thisMonth = data.filter(r => {
+    if (!r.date) return false;
+    const d = new Date(r.date);
+    return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+  });
+  document.getElementById('s-total').textContent = data.length;
+  document.getElementById('s-shows').textContent = new Set(data.map(r=>r.show).filter(Boolean)).size;
+  document.getElementById('s-recent').textContent = thisMonth.length;
+  document.getElementById('s-products').textContent = new Set(data.map(r=>r.product).filter(Boolean)).size;
+}
+
+function updateHeaderCount() {
+  const n = load().length;
+  document.getElementById('headerCount').textContent = n + ' contact' + (n===1?'':'s');
+}
+
+// ── Export CSV ───────────────────────────────────────────────────────────────
+function exportCSV() {
+  const data = load();
+  if (!data.length) { showToast('No contacts to export', '#c8622a'); return; }
+  const header = ['Name','Phone','Show','Date','Product','Notes'];
+  const rows = data.map(r => [r.name, r.phone, r.show, r.date, r.product, r.notes].map(v => `"${(v||'').replace(/"/g,'""')}"`));
+  const csv = [header, ...rows].map(r => r.join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = 'amway_contacts.csv'; a.click();
+  URL.revokeObjectURL(url);
+  showToast('✅  CSV exported — open in Excel!', '#4a7c59');
+}
+
+// ── Helpers ──────────────────────────────────────────────────────────────────
+function esc(str) {
+  return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function formatDate(d) {
+  const [y,m,day] = d.split('-');
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return `${months[+m-1]} ${+day}, ${y}`;
+}
+function showToast(msg, bg='#4a7c59') {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.style.background = bg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ── Init ─────────────────────────────────────────────────────────────────────
+updateHeaderCount();
+</script>
+</body>
+</html>

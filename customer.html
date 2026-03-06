@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Amway — Sign Up</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink:    #1a1208;
+    --burnt:  #c8622a;
+    --amber:  #e8a050;
+    --cream:  #faf7f2;
+    --card:   #ffffff;
+    --mist:   #e8e0d4;
+    --ghost:  #b0a090;
+    --sage:   #4a7c59;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    background: var(--cream);
+    font-family: 'DM Sans', sans-serif;
+    color: var(--ink);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── Top bar ── */
+  .topbar {
+    background: var(--ink);
+    padding: 18px 28px;
+    text-align: center;
+  }
+  .topbar-brand {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--amber);
+    letter-spacing: 0.06em;
+  }
+  .topbar-brand span { color: #fff; font-weight: 400; }
+  .topbar-sub {
+    font-size: 0.78rem;
+    color: var(--ghost);
+    margin-top: 2px;
+    font-weight: 300;
+    letter-spacing: 0.04em;
+  }
+
+  /* ── Screens ── */
+  .screen { display: none; flex: 1; flex-direction: column; }
+  .screen.active { display: flex; }
+
+  /* ── Form screen ── */
+  .form-screen {
+    padding: 36px 28px 40px;
+    max-width: 540px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  .welcome-line {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2rem;
+    font-weight: 600;
+    line-height: 1.2;
+    margin-bottom: 6px;
+    color: var(--ink);
+  }
+  .welcome-sub {
+    font-size: 0.88rem;
+    color: var(--ghost);
+    font-weight: 300;
+    margin-bottom: 36px;
+  }
+
+  /* ── Input fields ── */
+  .field { margin-bottom: 22px; }
+  .field label {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ghost);
+    margin-bottom: 8px;
+  }
+  .field input {
+    width: 100%;
+    padding: 18px 20px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1.15rem;
+    font-weight: 500;
+    color: var(--ink);
+    background: var(--card);
+    border: 2px solid var(--mist);
+    border-radius: 16px;
+    outline: none;
+    transition: border 0.2s, box-shadow 0.2s;
+    -webkit-appearance: none;
+  }
+  .field input:focus {
+    border-color: var(--burnt);
+    box-shadow: 0 0 0 4px rgba(200,98,42,0.10);
+  }
+  .field input::placeholder { color: #c8bfb0; font-weight: 300; }
+
+  /* ── Product buttons ── */
+  .section-label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ghost);
+    margin-bottom: 12px;
+  }
+  .product-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+  .prod-btn {
+    background: var(--card);
+    border: 2px solid var(--mist);
+    border-radius: 16px;
+    padding: 18px 14px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.18s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+  }
+  .prod-btn:active { transform: scale(0.97); }
+  .prod-btn.selected {
+    border-color: var(--burnt);
+    background: #fff5f0;
+    box-shadow: 0 0 0 3px rgba(200,98,42,0.12);
+  }
+  .prod-icon { font-size: 2rem; line-height: 1; }
+  .prod-name {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--ink);
+    line-height: 1.2;
+  }
+  .prod-desc {
+    font-size: 0.72rem;
+    color: var(--ghost);
+    font-weight: 300;
+  }
+
+  /* ── Delivery toggle ── */
+  .delivery-row {
+    background: var(--card);
+    border: 2px solid var(--mist);
+    border-radius: 16px;
+    padding: 18px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 32px;
+    cursor: pointer;
+    transition: all 0.18s;
+    user-select: none;
+  }
+  .delivery-row.on {
+    border-color: var(--sage);
+    background: #f0faf4;
+  }
+  .delivery-left { display: flex; flex-direction: column; gap: 2px; }
+  .delivery-title {
+    font-size: 1rem;
+    font-weight: 600;
+  }
+  .delivery-sub {
+    font-size: 0.78rem;
+    color: var(--ghost);
+    font-weight: 300;
+  }
+  .toggle {
+    width: 52px; height: 30px;
+    background: var(--mist);
+    border-radius: 50px;
+    position: relative;
+    transition: background 0.25s;
+    flex-shrink: 0;
+  }
+  .toggle::after {
+    content: '';
+    position: absolute;
+    width: 24px; height: 24px;
+    background: #fff;
+    border-radius: 50%;
+    top: 3px; left: 3px;
+    transition: transform 0.25s;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  }
+  .delivery-row.on .toggle { background: var(--sage); }
+  .delivery-row.on .toggle::after { transform: translateX(22px); }
+
+  /* ── Submit button ── */
+  .submit-btn {
+    width: 100%;
+    background: var(--burnt);
+    color: #fff;
+    border: none;
+    padding: 20px;
+    border-radius: 18px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.02em;
+    box-shadow: 0 4px 20px rgba(200,98,42,0.35);
+  }
+  .submit-btn:hover { background: #a84e20; }
+  .submit-btn:active { transform: scale(0.98); box-shadow: none; }
+
+  .privacy-note {
+    text-align: center;
+    font-size: 0.72rem;
+    color: var(--ghost);
+    margin-top: 14px;
+    font-weight: 300;
+  }
+
+  /* ── Thank you screen ── */
+  .thanks-screen {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 28px;
+    text-align: center;
+    max-width: 480px;
+    margin: 0 auto;
+    width: 100%;
+  }
+  .thanks-circle {
+    width: 100px; height: 100px;
+    background: linear-gradient(135deg, var(--burnt), var(--amber));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.8rem;
+    margin-bottom: 28px;
+    animation: popIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    box-shadow: 0 8px 32px rgba(200,98,42,0.35);
+  }
+  @keyframes popIn {
+    from { transform: scale(0); opacity: 0; }
+    to   { transform: scale(1); opacity: 1; }
+  }
+  .thanks-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2.4rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    animation: fadeUp 0.5s 0.2s ease both;
+  }
+  .thanks-name {
+    color: var(--burnt);
+  }
+  .thanks-sub {
+    font-size: 0.95rem;
+    color: var(--ghost);
+    font-weight: 300;
+    line-height: 1.6;
+    margin-bottom: 36px;
+    animation: fadeUp 0.5s 0.3s ease both;
+  }
+  .thanks-detail {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 20px 24px;
+    width: 100%;
+    margin-bottom: 28px;
+    text-align: left;
+    border: 1px solid var(--mist);
+    animation: fadeUp 0.5s 0.4s ease both;
+  }
+  .detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--mist);
+    font-size: 0.88rem;
+  }
+  .detail-row:last-child { border-bottom: none; }
+  .detail-key { color: var(--ghost); font-weight: 400; }
+  .detail-val { font-weight: 600; text-align: right; max-width: 60%; }
+
+  .next-btn {
+    background: var(--ink);
+    color: #fff;
+    border: none;
+    padding: 16px 40px;
+    border-radius: 50px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    animation: fadeUp 0.5s 0.5s ease both;
+  }
+  .next-btn:hover { background: var(--burnt); }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (min-width: 600px) {
+    .form-screen { padding: 48px 40px; }
+    .welcome-line { font-size: 2.4rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-brand">Amway <span>Products</span></div>
+  <div class="topbar-sub">Expo Sign-Up</div>
+</div>
+
+<!-- ── FORM SCREEN ── -->
+<div class="screen active" id="screen-form">
+  <div class="form-screen">
+
+    <div class="welcome-line">Hey there! 👋<br>Stay in touch.</div>
+    <div class="welcome-sub">Leave your details and we'll reach out with offers & free delivery.</div>
+
+    <div class="field">
+      <label>Your Name</label>
+      <input type="text" id="c-name" placeholder="First & last name" autocomplete="name">
+    </div>
+
+    <div class="field">
+      <label>Phone Number</label>
+      <input type="tel" id="c-phone" placeholder="e.g. 312-555-0101" autocomplete="tel">
+    </div>
+
+    <div class="section-label">I'm interested in…  <span style="font-size:0.68rem;color:#d0c8b8">(tap all that apply)</span></div>
+    <div class="product-grid">
+      <div class="prod-btn" onclick="toggleProduct(this, 'Nutrition')" data-val="Nutrition">
+        <div class="prod-icon">🌿</div>
+        <div class="prod-name">Nutrition</div>
+        <div class="prod-desc">Vitamins & protein</div>
+      </div>
+      <div class="prod-btn" onclick="toggleProduct(this, 'Beauty')" data-val="Beauty">
+        <div class="prod-icon">✨</div>
+        <div class="prod-name">Beauty</div>
+        <div class="prod-desc">Skincare & makeup</div>
+      </div>
+      <div class="prod-btn" onclick="toggleProduct(this, 'Home')" data-val="Home">
+        <div class="prod-icon">🏠</div>
+        <div class="prod-name">Home</div>
+        <div class="prod-desc">Cleaners & purifiers</div>
+      </div>
+      <div class="prod-btn" onclick="toggleProduct(this, 'Energy')" data-val="Energy">
+        <div class="prod-icon">⚡</div>
+        <div class="prod-name">Energy</div>
+        <div class="prod-desc">XS drinks & more</div>
+      </div>
+    </div>
+
+    <div class="delivery-row" id="deliveryToggle" onclick="toggleDelivery()">
+      <div class="delivery-left">
+        <div class="delivery-title">🚚 Free Delivery</div>
+        <div class="delivery-sub">Yes, I'd love free delivery on my first order</div>
+      </div>
+      <div class="toggle" id="toggleKnob"></div>
+    </div>
+
+    <button class="submit-btn" onclick="submitForm()">Count me in →</button>
+    <div class="privacy-note">🔒 Your info is only used to follow up with you. Nothing else.</div>
+
+  </div>
+</div>
+
+<!-- ── THANK YOU SCREEN ── -->
+<div class="screen" id="screen-thanks">
+  <div class="thanks-screen">
+    <div class="thanks-circle">🎉</div>
+    <div class="thanks-title">You're in, <span class="thanks-name" id="t-name">friend</span>!</div>
+    <div class="thanks-sub">We'll reach out soon with your products and a special offer. Watch your phone!</div>
+
+    <div class="thanks-detail">
+      <div class="detail-row">
+        <span class="detail-key">Name</span>
+        <span class="detail-val" id="t-name-d">—</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-key">Phone</span>
+        <span class="detail-val" id="t-phone-d">—</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-key">Interested in</span>
+        <span class="detail-val" id="t-products-d">—</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-key">Free Delivery</span>
+        <span class="detail-val" id="t-delivery-d">—</span>
+      </div>
+    </div>
+
+    <button class="next-btn" onclick="resetForm()">Next person ↩</button>
+  </div>
+</div>
+
+<script>
+const STORE_KEY = 'amway_contacts';
+let selectedProducts = [];
+let wantsDelivery = false;
+
+// Current show info — you can update this before each expo
+const CURRENT_SHOW = "Shipshiwana Road Show";
+const CURRENT_DATE = new Date().toISOString().split('T')[0];
+
+function toggleProduct(el, val) {
+  if (el.classList.contains('selected')) {
+    el.classList.remove('selected');
+    selectedProducts = selectedProducts.filter(v => v !== val);
+  } else {
+    el.classList.add('selected');
+    selectedProducts.push(val);
+  }
+}
+
+function toggleDelivery() {
+  wantsDelivery = !wantsDelivery;
+  document.getElementById('deliveryToggle').classList.toggle('on', wantsDelivery);
+}
+
+function submitForm() {
+  const name  = document.getElementById('c-name').value.trim();
+  const phone = document.getElementById('c-phone').value.trim();
+
+  if (!name) { shake('c-name'); return; }
+  if (!phone) { shake('c-phone'); return; }
+
+  // Save to localStorage
+  const data = loadContacts();
+  data.push({
+    id: Date.now(),
+    show: CURRENT_SHOW,
+    date: CURRENT_DATE,
+    name,
+    phone,
+    product: selectedProducts.join(', ') || 'Not specified',
+    delivery: wantsDelivery ? 'Yes' : 'No',
+    notes: ''
+  });
+  saveContacts(data);
+
+  // Show thank you screen
+  const firstName = name.split(' ')[0];
+  document.getElementById('t-name').textContent = firstName;
+  document.getElementById('t-name-d').textContent = name;
+  document.getElementById('t-phone-d').textContent = phone;
+  document.getElementById('t-products-d').textContent = selectedProducts.length ? selectedProducts.join(', ') : 'Not specified';
+  document.getElementById('t-delivery-d').textContent = wantsDelivery ? '✅ Yes!' : 'No';
+
+  document.getElementById('screen-form').classList.remove('active');
+  document.getElementById('screen-thanks').classList.add('active');
+}
+
+function resetForm() {
+  // Clear form
+  document.getElementById('c-name').value = '';
+  document.getElementById('c-phone').value = '';
+  selectedProducts = [];
+  wantsDelivery = false;
+  document.querySelectorAll('.prod-btn').forEach(b => b.classList.remove('selected'));
+  document.getElementById('deliveryToggle').classList.remove('on');
+
+  // Switch back
+  document.getElementById('screen-thanks').classList.remove('active');
+  document.getElementById('screen-form').classList.add('active');
+
+  // Scroll to top
+  window.scrollTo(0, 0);
+}
+
+function shake(id) {
+  const el = document.getElementById(id);
+  el.style.borderColor = '#c8622a';
+  el.style.animation = 'shake 0.35s ease';
+  el.focus();
+  setTimeout(() => { el.style.animation = ''; }, 400);
+}
+
+function loadContacts() {
+  try { return JSON.parse(localStorage.getItem(STORE_KEY)) || []; }
+  catch { return []; }
+}
+function saveContacts(data) {
+  localStorage.setItem(STORE_KEY, JSON.stringify(data));
+}
+</script>
+
+<style>
+@keyframes shake {
+  0%,100% { transform: translateX(0); }
+  20%      { transform: translateX(-8px); }
+  40%      { transform: translateX(8px); }
+  60%      { transform: translateX(-5px); }
+  80%      { transform: translateX(5px); }
+}
+</style>
+</body>
+</html>
